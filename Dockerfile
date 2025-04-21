@@ -1,15 +1,18 @@
 # 构建阶段
 FROM openjdk:17-slim AS build
 ENV HOME=/usr/app
-RUN mkdir -p $HOME
 WORKDIR $HOME
-ADD . WORKDIR
-RUN --mount=type=cache,target=/root/.m2 ./mvnw -f $HOME/pom.xml clean package
-RUN chmod +x mvnw
 
-# 运行阶段
+# 复制文件并显式设置 mvnw 权限
+COPY . .
+RUN chmod +x ./mvnw
+
+# 使用缓存构建
+RUN --mount=type=cache,target=/root/.m2 ./mvnw clean package  # 移除 -f 参数（WORKDIR 已是项目根目录）
+
+# 打包阶段（保持不变）
 FROM openjdk:17-slim
 ARG JAR_FILE=/usr/app/target/*.jar
 COPY --from=build $JAR_FILE /app/runner.jar
-EXPOSE 8080
-ENTRYPOINT jav  a -jar /app/runner.jar
+EXPOSE 8081
+ENTRYPOINT java -jar /app/runner.jar
