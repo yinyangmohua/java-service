@@ -1,7 +1,7 @@
-name: Java-service CI/CD
+name: Java API CI/CD
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build-and-push:
@@ -15,7 +15,7 @@ jobs:
           registry: ${{ secrets.ACR_REGISTRY }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
-      - name: Build and Push Docker Image
+      - name: Build and push Docker Image
         uses: docker/build-push-action@v5
         with:
           context: .
